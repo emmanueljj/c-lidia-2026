@@ -1,0 +1,11 @@
+\begin{theindex}
+
+  \item {main}
+    \subitem {pr\_1.c}, \hyperpage{3}
+
+  \indexspace
+
+  \item {pr\_1.c}, \hyperpage{3}
+    \subitem {main}, \hyperpage{3}
+
+\end{theindex}
