@@ -1,20 +1,35 @@
+/*
+ * Archivo: serie_medios_v2.c
+ * Aproximacion de 1/2 integrando estabilizacion de error (Epsilon).
+ * Nivel 2: Incluye validacion de dominio y estructura for principal.
+ */
+
 #include <stdio.h>
 
-int main(void){
+int main(void) {
+    int n, i;
+    double resultado = 0.0, termino, epsilon = 1e-12;
 
-    int n,i, denominador;
-    float resultado = 0.0f;  
+    /* Validacion de dominio */
+    do {
+        printf("Ingrese el numero maximo de iteraciones (n >= 1): ");
+        scanf("%d", &n);
+    } while (n < 1);
 
-    /*validacion*/
-    do{
-        printf("ingresa el nummero  de terminos: ");
-        scanf("%d",&n);
-    } while (n<0);
-    
-    for ( i = 0; i <= n; i++){
-        denominador = (2*i+1)*(2*i+3);
-        resultado+=(float)1/denominador;
+    /* Bucle principal con estructura for */
+    for (i = 0; i < n; i++) {
+        termino = 1.0 / ((2.0 * i + 1.0) * (2.0 * i + 3.0));
+
+        /* Criterio de paro numerico */
+        if (termino < epsilon) {
+            break;
+        }
+
+        /* Acumulacion del termino */
+        resultado += termino;
     }
-    printf("resultado: %f",resultado);
+
+    printf("%lf\n", resultado);
+
     return 0;
 }

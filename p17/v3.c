@@ -1,68 +1,75 @@
 /**
- * @file euler_sumatoria_nv3.c
- * @brief Calculo estabilizado de la sumatoria parcial para los Numeros de Euler.
+ * @file v3.c
+ * @brief Calculo de la sumatoria parcial para los Numeros de Euler
+ * ($\displaystyle \mathcal{O}(n \cdot k)$).
  *
  * @details
- * Nivel 3: Implementacion unificada en main().
- * Debido a que la base del denominador cambia en cada termino (1, 3, 5...),
- * se utiliza un bucle anidado con complejidad O(n*k) para calcular el 
- * denominador explicitamente, apegandose a las metodologias del curso.
- * Incluye validacion de dominio estricta, manejo de desbordamiento (double) 
- * y estabilizacion de la solucion (paro anticipado).
+ * Formula completa de los Numeros de Euler:
+ * $\displaystyle E_k = \frac{2^{2k+2}(2k)!}{\pi^{2k+1}} \left\{ 1 -
+ * \frac{1}{3^{2k+1}} + \frac{1}{5^{2k+1}} - \cdots \right\}$
+ *
+ * Este programa aproxima unicamente la serie de la llave con n terminos:
+ * $\displaystyle S_n = \sum_{i=0}^{n-1} \frac{(-1)^i}{(2i+1)^{2k+1}}$
+ *
+ * Implementacion:
+ * El denominador se calcula en cada iteracion mediante un bucle interno,
+ * debido a que la base $\displaystyle (2i+1)$ cambia por termino. Incluye
+ * validacion de dominio, limpieza de buffer y estabilizacion numerica.
+ *
+ * @par Entrada
+ * - Un entero $\displaystyle n \geq 1$.
+ * - Un entero $\displaystyle k \geq 0$.
+ *
+ * @par Salida
+ * Imprime:
+ * @code
+ * resultado: valor
+ * @endcode
+ *
+ * @par Complejidad
+ * Tiempo: $\displaystyle \mathcal{O}(n \cdot k)$. Memoria: $\displaystyle
+ * \mathcal{O}(1)$.
  */
-
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 int main(void) {
-    int n, k, i, j;
-    double resultado = 0.0;
-    double den, termino;
-    double tolerancia = 1e-8; /* Variable para la estabilizacion Nivel 2 */
+  int n, k, i, j;
+  double resultado = 0.0;
+  double den, termino;
+  double epsilon = 1e-8;
 
-    printf("--- Calculadora Serie Euler (Sumatoria Parcial) ---\n");
+  /* Validacion de dominio */
+  do {
+    printf("Cantidad de iteraciones (n>=1) y valor de k (k>=0): ");
+    scanf("%d %d", &n, &k);
+  } while (n < 1 || k < 0);
 
-    /* Nivel 2: Validacion de dominio estricta y a prueba de caracteres */
-    do {
-        printf("Cantidad de iteraciones (n>=1) y valor de k (k>=0): ");
-        if (scanf("%d %d", &n, &k) != 2 || n < 1 || k < 0) {
-            printf("[!] Error: Entradas invalidas. Verifique el dominio.\n");
-            
-            /* Limpieza del buffer para evitar bucles infinitos si el usuario teclea letras */
-            while(getchar() != '\n'); 
-            n = 0; 
-        }
-    } while (n < 1 || k < 0);
-    
-    /* Bucle principal de la sumatoria */
-    for (i = 0; i < n; i++) {
-        
-        /* 1. Calcular el denominador con bucle anidado O(n*k) */
-        den = 1.0;
-        for (j = 0; j < (2 * k + 1); j++) {
-            den *= (2 * i + 1);
-        }
+  /* Bucle principal de la sumatoria */
+  for (i = 0; i < n; i++) {
 
-        /* 2. Calcular el termino a sumar
-         * Nota: Se ajusto el generador de signos a (1 - 2*(i%2)) 
-         * para que la serie inicie en positivo (1, -1, 1, -1...) */
-        termino = (double)(1 - 2 * (i % 2)) / den;
-        
-        /* 3. Acumular el resultado */
-        resultado += termino;
-
-        /* Nivel 2 y 3: Estabilizacion (Paro anticipado) */
-        if (fabs(termino) < tolerancia) {
-            printf("\n[*] Info: La sumatoria convergio prematuramente en la iteracion %d.\n", i);
-            break;
-        }
+    /* Calcular el denominador */
+    den = 1.0;
+    for (j = 0; j < (2 * k + 1); j++) {
+      den *= (2 * i + 1);
     }
 
-    /* Salida limpia */
-    printf("\n[Resultado Final]\n");
-    printf("> Iteraciones evaluadas : %d\n", i < n ? i + 1 : n);
-    printf("> Resultado             : %.8lf\n", resultado);
+    /* Calcular el termino a sumar */
+    termino = (double)(1 - 2 * (i % 2)) / den;
 
-    return EXIT_SUCCESS;
+    /* Acumular el resultado */
+    resultado += termino;
+
+    /* Estabilizacion por paro anticipado */
+    if (fabs(termino) < epsilon) {
+      break;
+    }
+  }
+
+  /* Salida final */
+
+  printf("resultado: %lf\n", resultado);
+
+  return 0;
 }

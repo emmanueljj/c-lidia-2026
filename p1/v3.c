@@ -1,53 +1,63 @@
 /**
- * @file calcular_ln2_optimizado.c
- * @brief Cálculo de la aproximación de ln(2) mediante serie armónica alternada.
- * @details Implementación optimizada que evita el uso de librerías externas (como math.h) 
- * y variables de estado auxiliares para el signo. La alternancia se logra dinámicamente 
- * mediante operaciones aritméticas modulares.
+ * @file ln2_v3.c
+ * @brief Aproximacion de $\displaystyle \ln(2)$ usando recurrencia continua y optimizacion pura ($\displaystyle \mathcal{O}(n)$).
+ *
+ * @details
+ * Serie de Mercator (armonica alternada):
+ * $\displaystyle \ln(2) = \sum_{i=1}^{\infty} (-1)^{i+1} \frac{1}{i} = 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \cdots$
+ *
+ * Este programa aproxima con n terminos:
+ * $\displaystyle \ln(2) \approx \sum_{i=1}^{n} (-1)^{i+1} \frac{1}{i}$
+ *
+ * Implementacion:
+ * - Se evita el uso de modulos (%) para la alternancia del signo.
+ * - Se reemplaza por una recurrencia in-line pura para el signo ($\displaystyle signo = -signo$).
+ *
+ * @par Entrada
+ * - Un entero $\displaystyle n \geq 1$.
+ *
+ * @par Salida
+ * Imprime:
+ * @code
+ * valor_flotante
+ * @endcode
+ *
+ * @par Complejidad
+ * Tiempo: $\displaystyle \mathcal{O}(n)$. Memoria: $\displaystyle \mathcal{O}(1)$.
+ *
+ * @note
+ * Es la version mas eficiente al operar solo con sumas e inversiones de signo directas,
+ * logrando un balance perfecto entre velocidad y uso de memoria.
  */
 
 #include <stdio.h>
+#include <math.h>
 
-/**
- * @brief Punto de entrada principal del programa.
- * @return Retorna 0 al finalizar la ejecución exitosamente.
- */
-int main(void)
-{
-    /* Declaración de variables:
-     * n: Número total de iteraciones (límite superior de la sumatoria).
-     * k: Variable iteradora y denominador actual en la serie.
-     * Nota: Se omite la variable 'j' original por falta de uso.
-     */
+int main(void) {
     int n, k;
-    
-    /* Acumulador de punto flotante para almacenar el resultado de la sumatoria */
-    float ln2 = 0;
-    
-    /* * Validación de dominio:
-     * Se implementa un ciclo de control estricto do-while para garantizar 
-     * que el usuario introduzca un valor entero N >= 1, evitando así 
-     * divisiones por cero o cálculos inválidos.
-     */
+    double ln2 = 0.0, signo = 1.0;
+    double epsilon = 1e-8;
+
+    /* Validacion estricta de dominio */
     do {
-        printf("Ingrese el numero de iteraciones: ");
+        printf("Ingrese el numero de iteraciones (n >= 1): ");
         scanf("%d", &n);
     } while (n < 1);
-    
 
-    /* Bucle de sumatoria (Desarrollo en serie) */
-    for (k = 1; k <= n; k++)
-    {
-        /* * Cálculo y acumulación del enésimo término:
-         * El signo se deduce algorítmicamente mediante la expresión (-1 + 2*(k%2)):
-         * - Si 'k' es impar (k%2 == 1): (-1 + 2) =  1 (Término se suma).
-         * - Si 'k' es par   (k%2 == 0): (-1 + 0) = -1 (Término se resta).
-         */
-        ln2 += (float)(-1 + 2 * (k % 2)) / k;    
+    /* Bucle principal optimizado */
+    for (k = 1; k <= n; k++) {
+        if (fabs(signo / k) < epsilon) {
+            break;
+        }
+
+        ln2 += signo / k;    
+        
+        /* Inversion del signo por recurrencia */
+        signo = -signo; 
     }
     
-    /* Presentación de resultados al usuario */
-    printf("Resultado: %f\n", ln2);
+    /* Salida cruda del resultado */
+    printf("%lf\n", ln2);
 
     return 0;
 }
