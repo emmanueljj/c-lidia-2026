@@ -6,7 +6,7 @@ int main(void)
     int n, k, j, signo; /*se evita usar variabla para denominador*/
     float ln2 = 0.0f;
 
-    /*se implementa validacion*/
+    // validacion de dominio
     do{
         printf("Ingrese el numero de iteraciones: ");
         scanf("%d", &n);
